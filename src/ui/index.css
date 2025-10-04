@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-*: initial;
+  --color-green: #08cb00;
+  --color-black: #37353e;
+  --font-display: "NeoDunggeunmoPro", sans-serif;
+}
+
+@font-face {
+  font-family: NeoDunggeunmoPro;
+  font-style: normal;
+  font-weight: normal;
+  font-display: swap;
+  src: url("./assets/font/NeoDunggeunmoPro-Regular.woff2");
+}
