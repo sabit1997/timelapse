@@ -1,4 +1,5 @@
-import { BrowserWindow, app } from "electron";
+import { BrowserWindow, app, desktopCapturer, ipcMain } from "electron";
+import path from "path";
 
 const isDev = process.env.DEV != undefined;
 const isPreview = process.env.PREVIEW != undefined;
@@ -7,6 +8,9 @@ const createWindow = () => {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+    },
   });
 
   if (isDev) {
@@ -22,13 +26,27 @@ const createWindow = () => {
 };
 
 app.whenReady().then(() => {
+  ipcMain.handle("get-sources", async () => {
+    const sources = await desktopCapturer.getSources({
+      types: ["window", "screen"],
+    });
+
+    return sources.map((source) => {
+      return {
+        id: source.id,
+        name: source.name,
+        thumbnail: source.thumbnail.toDataURL(),
+      };
+    });
+  });
+
   createWindow();
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
+});
 
-  app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") app.quit();
-  });
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
 });
